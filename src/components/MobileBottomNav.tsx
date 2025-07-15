@@ -3,7 +3,6 @@
 import {
   Clover,
   Film,
-  Github,
   Home,
   MessageCircleHeart,
   MountainSnow,
@@ -15,8 +14,6 @@ import {
 } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-
-import { useSite } from './SiteProvider';
 
 interface MobileBottomNavProps {
   /**
