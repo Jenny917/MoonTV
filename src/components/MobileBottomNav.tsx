@@ -3,7 +3,6 @@
 import {
   Clover,
   Film,
-  Github,
   Home,
   MessageCircleHeart,
   MountainSnow,
@@ -15,8 +14,6 @@ import {
 } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-
-import { useSite } from './SiteProvider';
 
 interface MobileBottomNavProps {
   /**
@@ -36,17 +33,17 @@ const MobileBottomNav = ({ activePath }: MobileBottomNavProps) => {
     { icon: Search, label: '搜索', href: '/search' },
     {
       icon: Film,
-      label: '热门电影',
+      label: '电影',
       href: '/douban?type=movie&tag=热门&title=热门电影',
     },
     {
       icon: Tv,
-      label: '热门剧集',
+      label: '剧集',
       href: '/douban?type=tv&tag=热门&title=热门剧集',
     },
     {
       icon: Star,
-      label: '豆瓣 Top250',
+      label: '高分',
       href: '/douban?type=movie&tag=top250&title=豆瓣 Top250',
     },
     {
