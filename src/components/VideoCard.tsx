@@ -30,10 +30,11 @@ interface VideoCardProps {
   year?: string;
   from: 'playrecord' | 'favorite' | 'search' | 'douban';
   currentEpisode?: number;
-  douban_id?: string;
+  douban_id?: number;
   onDelete?: () => void;
   rate?: string;
   items?: SearchResult[];
+  type?: string;
 }
 
 export default function VideoCard({
@@ -52,6 +53,7 @@ export default function VideoCard({
   onDelete,
   rate,
   items,
+  type = '',
 }: VideoCardProps) {
   const router = useRouter();
   const [favorited, setFavorited] = useState(false);
@@ -61,7 +63,7 @@ export default function VideoCard({
 
   const aggregateData = useMemo(() => {
     if (!isAggregate || !items) return null;
-    const countMap = new Map<string | number, number>();
+    const countMap = new Map<number, number>();
     const episodeCountMap = new Map<number, number>();
     items.forEach((item) => {
       if (item.douban_id && item.douban_id !== 0) {
@@ -73,11 +75,9 @@ export default function VideoCard({
       }
     });
 
-    const getMostFrequent = <T extends string | number>(
-      map: Map<T, number>
-    ) => {
+    const getMostFrequent = (map: Map<number, number>) => {
       let maxCount = 0;
-      let result: T | undefined;
+      let result: number | undefined;
       map.forEach((cnt, key) => {
         if (cnt > maxCount) {
           maxCount = cnt;
@@ -98,17 +98,15 @@ export default function VideoCard({
   const actualPoster = aggregateData?.first.poster ?? poster;
   const actualSource = aggregateData?.first.source ?? source;
   const actualId = aggregateData?.first.id ?? id;
-  const actualDoubanId = String(
-    aggregateData?.mostFrequentDoubanId ?? douban_id
-  );
+  const actualDoubanId = aggregateData?.mostFrequentDoubanId ?? douban_id;
   const actualEpisodes = aggregateData?.mostFrequentEpisodes ?? episodes;
   const actualYear = aggregateData?.first.year ?? year;
   const actualQuery = query || '';
   const actualSearchType = isAggregate
-    ? aggregateData?.first.episodes.length === 1
+    ? aggregateData?.first.episodes?.length === 1
       ? 'movie'
       : 'tv'
-    : '';
+    : type;
 
   // 获取收藏状态
   useEffect(() => {
@@ -195,7 +193,11 @@ export default function VideoCard({
 
   const handleClick = useCallback(() => {
     if (from === 'douban') {
-      router.push(`/play?title=${encodeURIComponent(actualTitle.trim())}`);
+      router.push(
+        `/play?title=${encodeURIComponent(actualTitle.trim())}${
+          actualYear ? `&year=${actualYear}` : ''
+        }${actualSearchType ? `&stype=${actualSearchType}` : ''}`
+      );
     } else if (actualSource && actualId) {
       router.push(
         `/play?source=${actualSource}&id=${actualId}&title=${encodeURIComponent(
@@ -334,9 +336,9 @@ export default function VideoCard({
         )}
 
         {/* 豆瓣链接 */}
-        {config.showDoubanLink && actualDoubanId && (
+        {config.showDoubanLink && actualDoubanId && actualDoubanId !== 0 && (
           <a
-            href={`https://movie.douban.com/subject/${actualDoubanId}`}
+            href={`https://movie.douban.com/subject/${actualDoubanId.toString()}`}
             target='_blank'
             rel='noopener noreferrer'
             onClick={(e) => e.stopPropagation()}
